@@ -19,7 +19,6 @@ import Selector from './components/Selector';
 
 const unsplash = new Unsplash({
   applicationId: UNSPLASH_API_KEYS.KEY,
-  secret: UNSPLASH_API_KEYS.SECRET,
 })
 const TESTING = false;
 const INTERVAL_LIMIT = 10;
