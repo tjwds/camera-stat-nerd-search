@@ -1,3 +1,12 @@
+/* Still TODO:
+
+* refactor to separate components
+* refactor filter logic — DRY
+* Handle API limit
+* Hide secret key — server pass-through
+
+*/
+
 import React, { Component } from 'react';
 import './App.css';
 import Unsplash from 'unsplash-js';
@@ -8,14 +17,13 @@ import users from 'unsplash-js/lib/methods/users';
 import Image from './components/Image';
 import Selector from './components/Selector';
 
-
 const unsplash = new Unsplash({
   applicationId: UNSPLASH_API_KEYS.KEY,
   secret: UNSPLASH_API_KEYS.SECRET,
 })
 const TESTING = false;
-const INTERVAL_LIMIT = 1;
-const INTERVAL_SPEED = 1; // number of seconds
+const INTERVAL_LIMIT = 10;
+const INTERVAL_SPEED = 1; // number in seconds
 
 class App extends Component {
   constructor(props) {
@@ -26,6 +34,14 @@ class App extends Component {
       selector_values: {
         make: "default",
         model: "",
+        exposure_min: null,
+        exposure_max: null,
+        aperture_min: null,
+        aperture_max: null,
+        focal_length_min: null,
+        focal_length_max: null,
+        iso_min: null,
+        iso_max: null,
       },
       search: "",
       ready: false,
@@ -34,14 +50,10 @@ class App extends Component {
       currently_calling: false,
     };
   }
-  
-  componentDidMount() {
-    // this.getTargetPhotosAndAddImage();
-  }
 
   filterImage = (image) => {
-    // filter  
-    console.log(image);
+    //TODO:  refactor this so that it's ... better.
+
     let render_image = true;
 
     if (this.state.selector_values.make !== "default") {
@@ -66,7 +78,6 @@ class App extends Component {
         var model_search = this.state.selector_values.model;
         model_search = model_search.toLowerCase();
         model_search = model_search.replace(/\W/g, '');
-        console.log(model_search, exif);
         if (!exif.includes(model_search)) {
           render_image = false;
         }
@@ -74,6 +85,99 @@ class App extends Component {
         render_image = false;
       }
     }
+
+    if (this.state.selector_values.exposure_max) {
+      var exif = image.exif.exposure_time;
+      if (exif) {
+        exif = Number(exif.substring(2))
+        if (exif >= Number(this.state.selector_values.exposure_max)) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+    if (this.state.selector_values.exposure_min) {
+      var exif = image.exif.exposure_time;
+      if (exif) {
+        exif = Number(exif.substring(2))
+        if (exif <= this.state.selector_values.exposure_min) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+
+    if (this.state.selector_values.aperture_max) {
+      var exif = image.exif.aperture;
+      if (exif) {
+        exif = Number(exif)
+        if (exif >= Number(this.state.selector_values.aperture_max)) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+    if (this.state.selector_values.aperture_min) {
+      var exif = image.exif.aperture;
+      if (exif) {
+        exif = Number(exif)
+        if (exif <= this.state.selector_values.aperture_min) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+
+    if (this.state.selector_values.focal_length_max) {
+      var exif = image.exif.focal_length;
+      if (exif) {
+        exif = Number(exif)
+        if (exif >= Number(this.state.selector_values.focal_length_max)) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+    if (this.state.selector_values.focal_length_min) {
+      var exif = image.exif.focal_length;
+      if (exif) {
+        exif = Number(exif)
+        if (exif <= this.state.selector_values.focal_length_min) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+
+    if (this.state.selector_values.iso_max) {
+      var exif = image.exif.iso;
+      if (exif) {
+        exif = Number(exif)
+        if (exif >= Number(this.state.selector_values.iso_max)) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+    if (this.state.selector_values.iso_min) {
+      var exif = image.exif.iso;
+      if (exif) {
+        exif = Number(exif)
+        if (exif <= this.state.selector_values.iso_min) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+
     // now add the image
     if (render_image) {
       this.renderImage(image);
@@ -85,7 +189,6 @@ class App extends Component {
       unsplash.photos.getPhoto(photo.id)
       .then(response => response.json())
       .then(body => {
-        // console.log(JSON.stringify(body));
         var search_interval = this.state.search_interval + 1;
         // potentially filter
         this.filterImage(body);
@@ -97,7 +200,6 @@ class App extends Component {
   searchInterval = (data) => {
     if (this.state.search_interval < INTERVAL_LIMIT) {
       if (!this.state.currently_calling) {
-        console.log(data[this.state.search_interval]);
         this.getAnImageAndProcess(data[this.state.search_interval]);
       }
     } else {
@@ -110,7 +212,6 @@ class App extends Component {
     if (TESTING) {
       API_DATA.forEach(body => {
         this.renderImage(body);
-        // console.log(body);
       })
       this.setState({ ready: true });
     } else {
@@ -125,7 +226,6 @@ class App extends Component {
       unsplash_query()
       .then(response => response.json())
       .then(body => {
-        console.log(body);
         var search_results = body;
         if (body.results) {
           search_results = body.results;
@@ -133,9 +233,6 @@ class App extends Component {
         // this is surprisingly complicated.  Set an interval that will PROCEDURALLY set state and check if the unsplash call is finished before making another call.
         this.setState({loading: true});
         var apiInterval = window.setInterval(() => {this.searchInterval(search_results)}, INTERVAL_SPEED * 1000);
-        // body.results.forEach(photo => {
-        
-        // })
       })
     }
   }
@@ -150,49 +247,16 @@ class App extends Component {
     this.setState({ images: results, previous_images: results });
   }
 
-  // TODO:  fix the name of this method
   updateFilter = (event, type) => {
     // manage state
     var selector_values = this.state.selector_values;
     selector_values[type] = event.target.value;
     this.setState({ selector_values });
-
-    // filter 
-
-    // if (event.target.value === "default") {
-    //   this.setState({ images: this.state.previous_images })
-    // } else {
-    //   var images = this.state.previous_images;
-    //   images = images.filter(image => {
-    //     console.log(image, image.props)
-    //     let exif = image.props.image.exif[type];
-    //     if (exif) {
-    //       exif = exif.toLowerCase();
-    //       exif.replace(/\W/g, '');
-    //       return exif.includes(event.target.value);
-    //     } else {
-    //       return false;
-    //     }
-    //   });
-  
-    //   this.setState({ images });
-    // }
-    // console.log(this.state.images)
   }
 
+  // this name is a hold over from when it used to actually filter
   renderSearch = event => {
     this.setState({ search: event.target.value });
-    // this.setState({ search: event.target.value }, () => {
-    //   if (this.state.search === "white wall") {
-
-    //     this.setState({images: [], previous_images: []}, () => {
-    //       SEARCH_DATA.forEach(body => {
-    //         this.renderImage(body);
-    //         // console.log(body);
-    //       })
-    //     })
-    //   }
-    // })
   }
 
   doSearch = () => {
@@ -229,12 +293,30 @@ class App extends Component {
             <strong>model</strong><br />
             <input type="text" placeholder="model" onChange={e => this.updateFilter(e, "model")}></input>
           </div>
-          {/* <Selector 
-            type="make" 
-            options={["apple", "canon", "fujifilm", "nikon", "olympus", "sony"]} 
-            filterImages={this.filterImages} 
-            value={this.state.selector_values.make} 
-          /> */}
+
+        </div>
+        <div className="flex-line">
+          <div className="exifSelector">
+            <strong>exposure</strong><br />
+            1/<input type="number" placeholder="200" onChange={e => this.updateFilter(e, "exposure_min")} step="0.1"></input> to 1/<input type="number" placeholder="200" onChange={e => this.updateFilter(e, "exposure_max")} step="0.1"></input>
+          </div>
+        
+          <div className="exifSelector">
+            <strong>aperture</strong><br />
+            f/<input type="number" placeholder="8" onChange={e => this.updateFilter(e, "aperture_min")} step="0.1"></input> to f/<input type="number" placeholder="8" onChange={e => this.updateFilter(e, "aperture_max")} step="0.1"></input>
+          </div>
+        </div>
+
+        <div className="flex-line">
+          <div className="exifSelector">
+            <strong>focal length</strong><br />
+            <input type="number" placeholder="35" onChange={e => this.updateFilter(e, "focal_length_min")} step="0.1"></input>mm to <input type="number" placeholder="35" onChange={e => this.updateFilter(e, "focal_length_max")} step="0.1"></input>mm
+          </div>
+
+          <div className="exifSelector">
+            <strong>iso</strong><br />
+            <input type="number" placeholder="200" onChange={e => this.updateFilter(e, "iso_min")} step="100"></input> to <input type="number" placeholder="200" onChange={e => this.updateFilter(e, "iso_max")} step="100"></input>
+          </div>
         </div>
 
         <p>Please click once and be patient.  This app makes too many calls to the Unsplash API and has some pretty severe throttling built in to make sure that multiple people can use it at once.  The more specific your query, the more likely it is that you won't see any results.</p>
@@ -259,7 +341,7 @@ class App extends Component {
         <React.Fragment>
           <p className="flex-line">Found {this.state.images.length} images so far...</p>
           <p className="flex-line">About {Number(((INTERVAL_LIMIT - this.state.search_interval) * INTERVAL_SPEED) + INTERVAL_SPEED)} seconds remaining...</p>
-          <p className="flex-line"><button onClick={ () => console.log('lol') }>Or just view what we've found...</button></p>
+          <p className="flex-line"><button onClick={ () => {this.setState({ search_interval: Infinity, loading: false, ready: true }) }}>Or just view what we've found...</button></p>
         </React.Fragment>
       }
       </div>
