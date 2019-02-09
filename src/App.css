@@ -1,9 +1,46 @@
-.imageWrapper {
+.App {
   width: 800px;
   height: 100%; 
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   text-align: center;
+  margin: 0 auto;
+}
+
+.flex-line {
+  display: flex;
+  width: 800px;
+}
+
+.imageWrapper {
+  /* width: 800px; */
+  /* height: 100%;  */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  text-align: center;
   margin: 10px auto;
+  display: flex;
+}
+
+.float {
+  text-align: left;
+  padding-left: 10px;
+}
+
+.search {
+  font-size: 2rem;
+  margin: 0 auto;
+  width: 800px;
+  padding: 3px;
+}
+
+.exifSelector {
+  text-align: left;
+  padding: 10px;
+}
+
+p {
+  text-align: left;
 }
