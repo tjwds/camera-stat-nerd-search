@@ -42,17 +42,40 @@ class App extends Component {
   filterImage = (image) => {
     // filter  
     console.log(image);
+    let render_image = true;
+
     if (this.state.selector_values.make !== "default") {
       var exif = image.exif.make;
       if (exif) {
         exif = exif.toLowerCase();
-        exif.replace(/\W/g, '');
+        exif = exif.replace(/\W/g, '');
 
-        if (exif === this.state.selector_values.make) {
-          this.renderImage(image);
+        if (exif !== this.state.selector_values.make) {
+          render_image = false;
         }
+      } else {
+        render_image = false;
       }
-    } else {
+    } 
+
+    if (this.state.selector_values.model) {
+      var exif = image.exif.model;
+      if (exif) {
+        exif = exif.toLowerCase();
+        exif = exif.replace(/\W/g, '');
+        var model_search = this.state.selector_values.model;
+        model_search = model_search.toLowerCase();
+        model_search = model_search.replace(/\W/g, '');
+        console.log(model_search, exif);
+        if (!exif.includes(model_search)) {
+          render_image = false;
+        }
+      } else {
+        render_image = false;
+      }
+    }
+    // now add the image
+    if (render_image) {
       this.renderImage(image);
     }
   }
@@ -71,7 +94,7 @@ class App extends Component {
     })
   }
 
-  searchInterval = (data, apiInterval) => {
+  searchInterval = (data) => {
     if (this.state.search_interval < INTERVAL_LIMIT) {
       if (!this.state.currently_calling) {
         console.log(data[this.state.search_interval]);
@@ -109,7 +132,7 @@ class App extends Component {
         }
         // this is surprisingly complicated.  Set an interval that will PROCEDURALLY set state and check if the unsplash call is finished before making another call.
         this.setState({loading: true});
-        var apiInterval = window.setInterval(() => {this.searchInterval(search_results, apiInterval)}, INTERVAL_SPEED * 1000);
+        var apiInterval = window.setInterval(() => {this.searchInterval(search_results)}, INTERVAL_SPEED * 1000);
         // body.results.forEach(photo => {
         
         // })
@@ -128,7 +151,7 @@ class App extends Component {
   }
 
   // TODO:  fix the name of this method
-  filterImages = (event, type) => {
+  updateFilter = (event, type) => {
     // manage state
     var selector_values = this.state.selector_values;
     selector_values[type] = event.target.value;
@@ -198,13 +221,13 @@ class App extends Component {
           <Selector 
             type="make" 
             options={["apple", "canon", "fujifilm", "nikon", "olympus", "sony"]} 
-            filterImages={this.filterImages} 
+            filterImages={this.updateFilter} 
             value={this.state.selector_values.make} 
           />
 
           <div className="exifSelector">
             <strong>model</strong><br />
-            <input type="text" default="model"></input>
+            <input type="text" placeholder="model" onChange={e => this.updateFilter(e, "model")}></input>
           </div>
           {/* <Selector 
             type="make" 
