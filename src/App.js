@@ -229,9 +229,14 @@ class App extends Component {
         if (body.results) {
           search_results = body.results;
         }
+        // console.log(body);
         // this is surprisingly complicated.  Set an interval that will PROCEDURALLY set state and check if the unsplash call is finished before making another call.
-        this.setState({loading: true});
-        var apiInterval = window.setInterval(() => {this.searchInterval(search_results)}, INTERVAL_SPEED * 1000);
+        if (body.length) {
+          this.setState({loading: true});
+          var apiInterval = window.setInterval(() => {this.searchInterval(search_results)}, INTERVAL_SPEED * 1000);
+        } else {
+          this.setState({ready: true, loading: false});
+        }
       })
     }
   }
