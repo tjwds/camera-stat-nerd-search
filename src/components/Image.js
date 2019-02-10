@@ -8,11 +8,11 @@ class Image extends Component {
         className="imageWrapper"
       >
         <div className="float">
-          <img 
+          <a href={image.links.html}><img 
             className="image image-fullsize" 
             src={image.urls.small} 
             alt={image.description} 
-          />
+          /></a>
         </div>
         <div className="float">
           <pre><strong>{image.user.name}</strong></pre>

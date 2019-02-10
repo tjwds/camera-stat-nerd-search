@@ -265,11 +265,11 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <h1 className="flex-line">Camera Stat Nerd Search</h1>
       {!this.state.loading &&
       <React.Fragment>
       { !this.state.ready &&
       <React.Fragment>
-        <h1 className="flex-line">Camera Stat Nerd Search</h1>
         <p className="flex-line">Search Unsplash for specific camera stats</p>
 
           <input 
@@ -297,24 +297,24 @@ class App extends Component {
         <div className="flex-line">
           <div className="exifSelector">
             <strong>exposure</strong><br />
-            1/<input type="number" placeholder="200" onChange={e => this.updateFilter(e, "exposure_min")} step="0.1"></input> to 1/<input type="number" placeholder="200" onChange={e => this.updateFilter(e, "exposure_max")} step="0.1"></input>
+            1/<input type="number" placeholder="200" onChange={e => this.updateFilter(e, "exposure_min")} step="0.1" className="number-input"></input> to 1/<input type="number" placeholder="200" onChange={e => this.updateFilter(e, "exposure_max")} step="0.1" className="number-input"></input>
           </div>
         
           <div className="exifSelector">
             <strong>aperture</strong><br />
-            f/<input type="number" placeholder="8" onChange={e => this.updateFilter(e, "aperture_min")} step="0.1"></input> to f/<input type="number" placeholder="8" onChange={e => this.updateFilter(e, "aperture_max")} step="0.1"></input>
+            f/<input type="number" placeholder="8" onChange={e => this.updateFilter(e, "aperture_min")} step="0.1" className="number-input"></input> to f/<input type="number" placeholder="8" onChange={e => this.updateFilter(e, "aperture_max")} step="0.1" className="number-input"></input>
           </div>
         </div>
 
         <div className="flex-line">
           <div className="exifSelector">
             <strong>focal length</strong><br />
-            <input type="number" placeholder="35" onChange={e => this.updateFilter(e, "focal_length_min")} step="0.1"></input>mm to <input type="number" placeholder="35" onChange={e => this.updateFilter(e, "focal_length_max")} step="0.1"></input>mm
+            <input type="number" placeholder="35" onChange={e => this.updateFilter(e, "focal_length_min")} step="0.1" className="number-input"></input>mm to <input type="number" placeholder="35" onChange={e => this.updateFilter(e, "focal_length_max")} step="0.1" className="number-input"></input>mm
           </div>
 
           <div className="exifSelector">
             <strong>iso</strong><br />
-            <input type="number" placeholder="200" onChange={e => this.updateFilter(e, "iso_min")} step="100"></input> to <input type="number" placeholder="200" onChange={e => this.updateFilter(e, "iso_max")} step="100"></input>
+            <input type="number" placeholder="200" onChange={e => this.updateFilter(e, "iso_min")} step="100" className="number-input"></input> to <input type="number" placeholder="200" onChange={e => this.updateFilter(e, "iso_max")} step="100" className="number-input"></input>
           </div>
         </div>
 
@@ -338,8 +338,8 @@ class App extends Component {
       }
       { this.state.loading && 
         <React.Fragment>
-          <p className="flex-line">Found {this.state.images.length} images so far...</p>
-          <p className="flex-line">About {Number(((INTERVAL_LIMIT - this.state.search_interval) * INTERVAL_SPEED) + INTERVAL_SPEED)} seconds remaining...</p>
+          <p className="flex-line">Found {this.state.images.length} image{this.state.images.length !== 1 && "s"} so far...</p>
+          <p className="flex-line">About {Number(((INTERVAL_LIMIT - this.state.search_interval) * INTERVAL_SPEED) + INTERVAL_SPEED)} second{(Number(((INTERVAL_LIMIT - this.state.search_interval) * INTERVAL_SPEED) + INTERVAL_SPEED)) !== 1 && "s"} remaining...</p>
           <p className="flex-line"><button onClick={ () => {this.setState({ search_interval: Infinity, loading: false, ready: true }) }}>Or just view what we've found...</button></p>
         </React.Fragment>
       }
