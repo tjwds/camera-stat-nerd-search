@@ -22,7 +22,7 @@ const unsplash = new Unsplash({
 })
 const TESTING = false;
 const INTERVAL_LIMIT = 10;
-const INTERVAL_SPEED = 1; // number in seconds
+const INTERVAL_SPEED = 5; // number in seconds
 
 class App extends Component {
   constructor(props) {
