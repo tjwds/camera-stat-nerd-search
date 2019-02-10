@@ -21,7 +21,7 @@ const unsplash = new Unsplash({
   applicationId: UNSPLASH_API_KEYS.KEY,
 })
 const TESTING = false;
-const INTERVAL_LIMIT = 10;
+const INTERVAL_LIMIT = 15;
 const INTERVAL_SPEED = 5; // number in seconds
 
 class App extends Component {
@@ -47,6 +47,7 @@ class App extends Component {
       loading: false,
       search_interval: 0,
       currently_calling: false,
+      api_error: false,
     };
   }
 
@@ -184,15 +185,18 @@ class App extends Component {
   }
 
   getAnImageAndProcess = (photo) => {
+    console.log(photo);
     this.setState({currently_calling: true}, () => {
-      unsplash.photos.getPhoto(photo.id)
-      .then(response => response.json())
-      .then(body => {
-        var search_interval = this.state.search_interval + 1;
-        // potentially filter
-        this.filterImage(body);
-        this.setState({ search_interval, currently_calling: false })
-      })
+      if (photo) {
+        unsplash.photos.getPhoto(photo.id)
+        .then(response => response.json())
+        .then(body => {
+          var search_interval = this.state.search_interval + 1;
+          // potentially filter
+          this.filterImage(body);
+          this.setState({ search_interval, currently_calling: false })
+        })
+      }
     })
   }
 
@@ -231,12 +235,15 @@ class App extends Component {
         }
         // console.log(body);
         // this is surprisingly complicated.  Set an interval that will PROCEDURALLY set state and check if the unsplash call is finished before making another call.
-        if (body.length) {
+        if (search_results.length) {
           this.setState({loading: true});
           var apiInterval = window.setInterval(() => {this.searchInterval(search_results)}, INTERVAL_SPEED * 1000);
         } else {
           this.setState({ready: true, loading: false});
         }
+      })
+      .catch(error => {
+        this.setState({ loading: false, ready: true, api_error: true });
       })
     }
   }
@@ -332,7 +339,13 @@ class App extends Component {
         <React.Fragment>
           <p className="flex-line"><button onClick={() => window.location.reload()}>go back</button></p>
           {this.state.images.length === 0 &&
+          <React.Fragment>
+          { this.state.api_error ? 
+            <p>Sorry, we've hit the API limit.  Please come back in an hour!</p>
+          :
             <p>Sorry, we didn't find any images that match your search this time.  Maybe try to be a little less specific?</p>
+          }
+          </React.Fragment>
           }
         <div>
           {this.state.images}
