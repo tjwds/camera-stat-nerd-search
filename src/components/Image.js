@@ -15,7 +15,7 @@ class Image extends Component {
           /></a>
         </div>
         <div className="float">
-          <pre><strong>{image.user.name}</strong></pre>
+          <a href={image.user.links.html + '?utm_source=nerdsearch&utm_medium=referral'}><pre><strong>{image.user.name}</strong></pre></a>
           <pre>aperture:       {image.exif.aperture}</pre>
           <pre>exposure time:  {image.exif.exposure_time}</pre>
           <pre>focal length:   {image.exif.focal_length}</pre>
