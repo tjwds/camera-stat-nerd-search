@@ -1,3 +1,3 @@
-this is a work in progress!
+https://nerdsearch.joewoodspublishing.com
 
 ![](./assets/example.gif)
